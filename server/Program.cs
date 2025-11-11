@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using Backend.Data;
+using Backend.Services;
+using Backend.Middleware;
+using Backend.Data.Repositories;
+using Backend.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,10 +36,23 @@ builder.Services.AddAuthentication("Bearer")
         {
             OnChallenge = context =>
             {
-                context.Response.Headers.Append("Access-Control-Allow-Origin", builder.Configuration["FrontendUrl"] ?? "http://localhost:3042");
+                var origin = context.Request.Headers["Origin"].ToString();
+
+                // // Set the Access-Control-Allow-Origin header to the allowed origin
+                // if (origin == builder.Configuration["FrontendUrl"] || origin == "http://localhost:5025")
+                // {
+                context.Response.Headers.Append("Access-Control-Allow-Origin", origin);
+                // }
+
                 context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
                 context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
                 return Task.CompletedTask;
+
+                // context.Response.Headers.Append("Access-Control-Allow-Origin", builder.Configuration["FrontendUrl"] ?? "http://localhost:3042");
+                // context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                // context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                // return Task.CompletedTask;
             }
         };
     });
@@ -43,14 +60,33 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:3042")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy
+            // .WithOrigins("http://localhost:5025")
+            // .WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:3042", "http://localhost:5025")
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        // .AllowCredentials();
     });
 });
+
+builder.Services.AddDbContext<ApplicationDbContext>(opts =>
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("sqlserver")));
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
+
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+
+builder.Services.AddScoped<ITasksRepository, TasksRepository>();
+builder.Services.AddScoped<ITasksService, TasksService>();
+
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<ILogService, LogService>();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -82,9 +118,22 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 
-// Configure pipeline
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -94,7 +143,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowFrontend");
+app.UseCors("CorsPolicy");
+
+app.UseMiddleware<ExceptionsMiddleware>();
+
 app.MapControllers();
 
+app.MapHub<TasksHub>("/tasksHub");
+
 app.Run();
+
+public partial class Program { } // This is required for WebApplicationFactory to work
