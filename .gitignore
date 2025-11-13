@@ -23,7 +23,7 @@ dist/
 .vite/
 
 # dotenv environment variables
-.env
+# .env
 .env.local
 .env.*.local
 
