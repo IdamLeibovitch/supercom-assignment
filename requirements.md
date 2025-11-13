@@ -48,7 +48,9 @@ patterns.
   - Testing: Comprehensive testing for both front-end and back-end components.
   - Documentation: Detailed README with setup instructions, architectural overview, and
 explanations of key implementations.
+
 #### Submission Guidelines:
+
   - Submit the project via a Git repository.
   - Include all necessary setup scripts and instructions.
   - Ensure that the application can be easily set up and run in a local environment.

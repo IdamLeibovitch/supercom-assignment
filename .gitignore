@@ -1,8 +1,22 @@
-# Node.js
+# Root node_modules
 node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+# .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+pnpm-debug.log*
 
 # Vite
 dist/
@@ -13,17 +27,6 @@ dist/
 .env.local
 .env.*.local
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
 # .NET
 bin/
 obj/
@@ -31,14 +34,10 @@ obj/
 **/obj/
 *.user
 *.suo
-*.swp
 *.tmp
-*.log
 *.vs/
-.vscode/
 
 # Rider/JetBrains
-.idea/
 *.sln.iml
 
 # Coverage

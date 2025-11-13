@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Server",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/server/server.csproj"
+    },
+    {
+      "type": "node-terminal",
+      "name": "Run Frontend",
+      "request": "launch",
+      "command": "npm run dev -- --port ${FRONTEND_PORT:-3042}",
+      "cwd": "${workspaceFolder}/client",
+      "env": {
+        "HTTPS": "true"
+      }
+    }
+  ]
+}
