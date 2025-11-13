@@ -21,7 +21,7 @@ namespace Backend.Tests.Integration
             // Arrange
             var credentials = new UserCredentialsData
             {
-                UserName = $"testuser_123",
+                UserName = $"test_{Guid.NewGuid().ToString().Substring(0, 6)}",
                 Password = "password123"
             };
 
