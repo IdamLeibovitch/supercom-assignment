@@ -62,13 +62,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
+        var allowedOrigins = new[]
+        {
+            builder.Configuration["FrontendUrl"] ?? "http://localhost:5173",
+            "http://localhost:3042",
+            "http://localhost:5025"
+        };
+
         policy
-            // .WithOrigins("http://localhost:5025")
-            // .WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:3042", "http://localhost:5025")
-            .AllowAnyOrigin()
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod();
-        // .AllowCredentials();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 

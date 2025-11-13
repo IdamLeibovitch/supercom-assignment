@@ -35,12 +35,6 @@ namespace Backend.Controllers
         public async Task<IActionResult> GetUser(Guid id)
         {
             var user = await _usersService.GetUserByIdAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
             return Ok(user);
         }
 
