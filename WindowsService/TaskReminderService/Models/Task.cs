@@ -1,0 +1,47 @@
+// using System.ComponentModel.DataAnnotations;
+// using System.ComponentModel.DataAnnotations.Schema;
+
+// namespace TaskReminderService
+// {
+//     // [Table("Tasks")]
+//     public class Task
+//     {
+//         // [Key]
+//         public Guid Id { get; set; }
+
+//         // [Required]/ngth(200)]
+//         public required string Title { get; set; }
+
+//         // [Required]
+//         // [StringLength(2000)]
+//         public required string Description { get; set; }
+
+//         // [Required]
+//         // [DataType(DataType.Date)]
+//         public DateTime DueDate { get; set; }
+
+//         // [Required]
+//         // [EnumDataType(typeof(TaskPriority))]
+//         public TaskPriority Priority { get; set; }
+
+//         [Required]
+//         public Guid UserId { get; set; }
+
+//         // [ForeignKey(nameof(UserId))]
+//         // [InverseProperty(nameof(User.Tasks))]
+//         public required User User { get; set; }
+
+//         public bool IsReminderSent { get; set; }
+//         public DateTime? ReminderSentAt { get; set; }
+//         public int ReminderRetryCount { get; set; }
+//         public string? LastProcessingError { get; set; }
+//     }
+
+//     public enum TaskPriority
+//     {
+//         Low,
+//         Medium,
+//         High,
+//         Critical
+//     }
+// }

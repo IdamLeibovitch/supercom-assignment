@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251111185424_ApplyUserNameIndex")]
-    partial class ApplyUserNameIndex
+    [Migration("20251113025150_TaskReminderProps")]
+    partial class TaskReminderProps
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,8 +69,20 @@ namespace server.Data.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsReminderSent")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastProcessingError")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Priority")
                         .HasColumnType("int");
+
+                    b.Property<int>("ReminderRetryCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReminderSentAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()

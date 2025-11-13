@@ -97,5 +97,3 @@ To run the client tests:
    ```bash
    npm test
    ```
-
-If you rad so far you are awesome. thank you.

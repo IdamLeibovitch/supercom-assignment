@@ -31,14 +31,18 @@ namespace Backend.Data.Models
         [ForeignKey(nameof(UserId))]
         [InverseProperty(nameof(User.Tasks))]
         public required User User { get; set; }
+
+        public bool IsReminderSent { get; set; }
+        public DateTime? ReminderSentAt { get; set; }
+        public int ReminderRetryCount { get; set; }
+        public string? LastProcessingError { get; set; }
     }
 
-    // [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TaskPriority
     {
-      Low,
-      Medium,
-      High,
-      Critical
+        Low,
+        Medium,
+        High,
+        Critical
     }
 }
