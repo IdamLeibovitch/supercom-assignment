@@ -1,57 +1,65 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import { useAuth0 } from '@auth0/auth0-react';
+import { Provider } from 'react-redux';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { store } from './store/store';
+import Layout from './components/Layout';
+import { UserProvider } from './contexts';
+import { useSignalR } from './hooks/useSignalR';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Settings from './pages/Settings';
+import Tasks from './pages/Tasks';
 
-function App() {
-  const {
-    isAuthenticated,
-    user,
-    loginWithRedirect,
-    logout,
-    // getAccessTokenSilently,
-  } = useAuth0();
-  const [count, setCount] = useState(0);
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+  },
+});
 
-  // if (!isAuthenticated)
-  //   return <button onClick={() => loginWithRedirect()}>Log In</button>;
-  console.log(isAuthenticated);
-  console.log(user);
+function AppContent() {
+  useSignalR();
 
   return (
-    <>
-      <div>
-        <a href='https://vite.dev' target='_blank'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      {!isAuthenticated ? (
-        <button onClick={() => loginWithRedirect()}>Log In</button>
-      ) : (
-        <div>
-          <h1>Welcome, {user?.email}</h1>
-          <button onClick={() => logout({ returnTo: window.location.origin })}>
-            Log Out
-          </button>
-        </div>
-      )}
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className='read-the-docs'>
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <UserProvider>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/tasks" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <Tasks />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Layout>
+    </UserProvider>
+  );
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </ThemeProvider>
+    </Provider>
   );
 }
 
