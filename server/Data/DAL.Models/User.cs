@@ -32,6 +32,8 @@ namespace Backend.Data.Models
         [StringLength(254)]
         public string? Email { get; set; }
 
+        public string? Privileges { get; set; }
+
         // Navigation property
         [InverseProperty(nameof(Task.User))]
         public required ICollection<Task> Tasks { get; set; }

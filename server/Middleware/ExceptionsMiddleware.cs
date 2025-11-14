@@ -24,6 +24,13 @@ public class ConflictException : Exception
     }
 }
 
+public class ForbiddenException : Exception
+{
+    public ForbiddenException() : base() { }
+    public ForbiddenException(string message) : base(message) { }
+    public ForbiddenException(string message, Exception innerException) : base(message, innerException) { }
+}
+
 public class ExceptionsMiddleware
 {
     private readonly RequestDelegate _next;
@@ -45,6 +52,7 @@ public class ExceptionsMiddleware
             {
                 NotFoundException => 404,
                 ConflictException => 409,
+                ForbiddenException => 403,
                 _ => 500
             };
 

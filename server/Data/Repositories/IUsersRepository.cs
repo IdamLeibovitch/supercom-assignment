@@ -43,5 +43,27 @@ namespace Backend.Data.Repositories
     /// <param name="email">The new email for the user (optional)</param>
     /// <returns>A task representing the asynchronous operation</returns>
     System.Threading.Tasks.Task UpdateUserAsync(Guid userId, string? fullName, string? phoneNumber, string? email);
+
+    /// <summary>
+    /// Retrieves user details by their ID
+    /// </summary>
+    /// <param name="userId">The user ID to search for</param>
+    /// <returns>The user details if found, null otherwise</returns>
+    Task<UserDetails?> GetUserDetailsByIdAsync(Guid userId);
+
+    /// <summary>
+    /// Retrieves user privileges by their ID
+    /// </summary>
+    /// <param name="userId">The user ID to search for</param>
+    /// <returns>A list of user privileges</returns>
+    Task<IEnumerable<UserPrivilege>> GetUserPrivilegesAsync(Guid userId);
+
+    /// <summary>
+    /// Updates user privileges
+    /// </summary>
+    /// <param name="userId">The user ID of the user to update</param>
+    /// <param name="privileges">The new privileges for the user</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    Task UpdateUserPrivilegesAsync(Guid userId, IEnumerable<UserPrivilege> privileges);
   }
 }

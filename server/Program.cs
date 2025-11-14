@@ -9,6 +9,7 @@ using Backend.Services;
 using Backend.Middleware;
 using Backend.Data.Repositories;
 using Backend.Hubs;
+using Backend.Data.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,7 +81,12 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration.GetConnectionString("sqlserver")));
 
+// Add memory cache service
+builder.Services.AddMemoryCache();
+
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
+
+builder.Services.AddScoped<IUserPrivilegesCacheService, UserPrivilegesCacheService>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
@@ -147,10 +153,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<AuthenticationContextMiddleware>();
 app.UseAuthorization();
-app.UseCors("CorsPolicy");
-
 app.UseMiddleware<ExceptionsMiddleware>();
+app.UseCors("CorsPolicy");
 
 app.MapControllers();
 

@@ -8,9 +8,19 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        // Users
         CreateMap<User, UserCredentials>();
         CreateMap<User, UserInfo>();
+        CreateMap<User, UserDetails>()
+            .ForMember(dest => dest.Privileges, opt => opt.MapFrom(src =>
+                string.IsNullOrEmpty(src.Privileges)
+                    ? null
+                    : src.Privileges
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(p => Enum.Parse<UserPrivilege>(p.Trim()))
+                        .ToList()));
 
+        // Tasks
         CreateMap<Models.Task, TaskInfo>()
             .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User));
     }

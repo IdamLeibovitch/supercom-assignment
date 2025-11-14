@@ -1,6 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Backend.Data.Models;
+using Backend.Data.Services;
 using Backend.Middleware;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,13 @@ namespace Backend.Data.Repositories
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IUserPrivilegesCacheService _cacheService;
 
-        public UsersRepository(ApplicationDbContext context, IMapper mapper)
+        public UsersRepository(ApplicationDbContext context, IMapper mapper, IUserPrivilegesCacheService cacheService)
         {
             _context = context;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
         /// <inheritdoc />
@@ -77,6 +80,59 @@ namespace Backend.Data.Repositories
             user.Email = email;
 
             await _context.SaveChangesAsync();
+
+            _cacheService.Invalidate(userId);
+        }
+
+        /// <inheritdoc />
+        public async Task<UserDetails?> GetUserDetailsByIdAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            return user == null ? null : _mapper.Map<UserDetails>(user);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<UserPrivilege>> GetUserPrivilegesAsync(Guid userId)
+        {
+            return await _cacheService.GetOrSetAsync(userId, async () =>
+            {
+                var user = await _context.Users.FindAsync(userId);
+
+                if (user == null)
+                {
+                    throw NotFoundException.For<User>(userId);
+                }
+
+                if (string.IsNullOrEmpty(user.Privileges))
+                {
+                    return Enumerable.Empty<UserPrivilege>();
+                }
+
+                return user.Privileges
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(p => Enum.Parse<UserPrivilege>(p.Trim()))
+                    .Distinct()
+                    .ToList();
+            });
+        }
+
+        /// <inheritdoc />
+        public async System.Threading.Tasks.Task UpdateUserPrivilegesAsync(Guid userId, IEnumerable<UserPrivilege> privileges)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                throw NotFoundException.For<User>(userId);
+            }
+
+            user.Privileges = privileges.Any()
+                ? string.Join(",", privileges.Distinct().Select(p => p.ToString()))
+                 : null;
+
+            await _context.SaveChangesAsync();
+
+            _cacheService.Invalidate(userId);
         }
     }
 }
