@@ -1,6 +1,7 @@
 using Backend.Data;
 using Backend.Models;
 using Backend.Data.Repositories;
+using Backend.Data.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Backend.Middleware;
@@ -8,8 +9,6 @@ using Xunit;
 using AutoMapper;
 using Moq;
 using Backend.Data.Models;
-using System.Linq.Expressions;
-using Castle.Core.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Backend.Tests.Repositories
@@ -19,6 +18,7 @@ namespace Backend.Tests.Repositories
         private readonly ApplicationDbContext _context;
         private readonly UsersRepository _repository;
         private readonly IMapper _mapper;
+        private readonly Mock<IUserPrivilegesCacheService> _mockCacheService;
 
         public UsersRepositoryTests()
         {
@@ -32,14 +32,28 @@ namespace Backend.Tests.Repositories
             {
                 cfg.CreateMap<User, UserCredentials>();
                 cfg.CreateMap<User, UserInfo>();
+                cfg.CreateMap<User, UserDetails>()
+                    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                    .ForMember(dest => dest.Privileges, opt => opt.MapFrom(src =>
+                        string.IsNullOrEmpty(src.Privileges)
+                            ? null
+                            : src.Privileges
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(p => Enum.Parse<UserPrivilege>(p.Trim()))
+                                .Distinct()
+                                .ToList()));
             }, NullLoggerFactory.Instance);
             _mapper = config.CreateMapper();
 
-            // _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(MappingProfile), NullLoggerFactory.Instance));
+            _mockCacheService = new Mock<IUserPrivilegesCacheService>();
 
+            // Setup default behavior for cache service
+            _mockCacheService
+                .Setup(x => x.GetOrSetAsync(It.IsAny<Guid>(), It.IsAny<Func<Task<IEnumerable<UserPrivilege>>>>()))
+                .Returns<Guid, Func<Task<IEnumerable<UserPrivilege>>>>((_, factory) => factory());
 
-            // _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(MappingProfile), NullLoggerFactory.Instance));
-            _repository = new UsersRepository(_context, _mapper);
+            _repository = new UsersRepository(_context, _mapper, _mockCacheService.Object);
         }
 
         [Fact]
