@@ -1,14 +1,6 @@
-import {
-  Box,
-  Pagination,
-  Select,
-  MenuItem,
-  FormControl,
-  Typography,
-  Paper,
-} from '@mui/material';
+import { Box, Pagination as MuiPagination, Select, MenuItem, FormControl, Typography, Paper, } from '@mui/material';
 
-function TasksPagination({ page, pageSize, totalCount, totalPages, onPageChange, onPageSizeChange }) {
+function Pagination({ page, pageSize, totalCount, totalPages, onPageChange, onPageSizeChange }) {
   return (
     <Paper
       sx={{
@@ -40,7 +32,7 @@ function TasksPagination({ page, pageSize, totalCount, totalPages, onPageChange,
         </FormControl>
       </Box>
 
-      <Pagination
+      <MuiPagination
         count={totalPages}
         page={page}
         onChange={(e, value) => onPageChange(value)}
@@ -56,4 +48,4 @@ function TasksPagination({ page, pageSize, totalCount, totalPages, onPageChange,
   );
 }
 
-export default TasksPagination;
+export default Pagination;

@@ -62,7 +62,7 @@ namespace Backend.Tests.Services
             var result = await _service.GetOrSetAsync(userId, async () =>
             {
                 await Task.CompletedTask;
-                return new[] { UserPrivilege.UsersDelete }; // Different value
+                return new[] { UserPrivilege.TasksRead }; // Different value
             });
 
             // Assert

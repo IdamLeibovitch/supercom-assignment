@@ -11,7 +11,7 @@ export function UserProvider({ children }) {
   const token = useAppSelector((state) => state.auth.token);
 
   const { data, error,
-    // isLoading, 
+    isLoading,
   } = useGetCurrentUserQuery(undefined, {
     skip: !token,
   });
@@ -36,6 +36,8 @@ export function UserProvider({ children }) {
     fullName: data?.fullName || null,
     phoneNumber: data?.phoneNumber || null,
     email: data?.email || null,
+    privileges: data?.privileges || null,
+    isLoading
   };
 
   return (

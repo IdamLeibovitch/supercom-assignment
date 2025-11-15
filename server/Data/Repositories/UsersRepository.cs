@@ -23,13 +23,23 @@ namespace Backend.Data.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<UserInfo>> GetAllUsersAsync(int page = 1, int pageSize = 10)
+        public async Task<PaginatedResult<UserInfo>> GetAllUsersAsync(int page = 1, int pageSize = 10)
         {
-            return await _context.Users
+            var totalCount = await _context.Users.CountAsync();
+            
+            var users = await _context.Users
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ProjectTo<UserInfo>(_mapper.ConfigurationProvider)
                 .ToListAsync();
+
+            return new PaginatedResult<UserInfo>
+            {
+                Items = users,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         /// <inheritdoc />
@@ -85,7 +95,7 @@ namespace Backend.Data.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<UserDetails?> GetUserDetailsByIdAsync(Guid userId)
+        public async Task<UserDetails?> GetUserDetailsAsync(Guid userId)
         {
             var user = await _context.Users.FindAsync(userId);
             return user == null ? null : _mapper.Map<UserDetails>(user);

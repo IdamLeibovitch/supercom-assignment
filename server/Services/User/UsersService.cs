@@ -15,7 +15,11 @@ public class UsersService : IUsersService
     private readonly IHubContext<TasksHub> _hubContext;
     private readonly ILogService _logService;
 
-    public UsersService(IUsersRepository usersRepository, IMapper mapper, IHubContext<TasksHub> hubContext, ILogService logService)
+    public UsersService(
+        IUsersRepository usersRepository,
+        IMapper mapper,
+        IHubContext<TasksHub> hubContext,
+        ILogService logService)
     {
         _usersRepository = usersRepository;
         _mapper = mapper;
@@ -24,7 +28,7 @@ public class UsersService : IUsersService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<UserInfo>> GetAllUsersAsync(int page = 1, int pageSize = 10)
+    public async Task<PaginatedResult<UserInfo>> GetAllUsersAsync(int page = 1, int pageSize = 10)
     {
         return await _usersRepository.GetAllUsersAsync(page, pageSize);
     }
@@ -41,6 +45,21 @@ public class UsersService : IUsersService
         var user = await _usersRepository.GetUserByIdAsync(userId)
             ?? throw new NotFoundException($"User with ID {userId} was not found.");
         return user!;
+    }
+
+    /// <inheritdoc />
+    public async Task<UserDetails> GetUserDetailsAsync(Guid userId)
+    {
+        var userDetails = await _usersRepository.GetUserDetailsAsync(userId);
+
+        if (userDetails == null)
+        {
+            throw new NotFoundException($"User with ID {userId} was not found.");
+        }
+
+        var privileges = await _usersRepository.GetUserPrivilegesAsync(userId);
+
+        return userDetails;
     }
 
     public async Task<Guid> CreateUserAsync(string userName, string password)
@@ -60,5 +79,19 @@ public class UsersService : IUsersService
         await _logService.LogAsync<UserInfo>(AuditAction.Update, new { userId, fullName, phoneNumber, email });
 
         await _hubContext.Clients.All.SendAsync(TasksHub.UserUpdated, userId);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<UserPrivilege>> GetUserPrivilegesAsync(Guid userId)
+    {
+        return await _usersRepository.GetUserPrivilegesAsync(userId);
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateUserPrivilegesAsync(Guid userId, IEnumerable<UserPrivilege> privileges)
+    {
+        await _usersRepository.UpdateUserPrivilegesAsync(userId, privileges);
+
+        await _logService.LogAsync<UserPrivilege>(AuditAction.Update, new { userId, privileges });
     }
 }

@@ -34,10 +34,10 @@ namespace Backend.Tests.Attributes
             // Arrange
             var attribute = new RequirePrivilegesAttribute(UserPrivilege.UsersRead);
             var context = CreateAuthorizationFilterContext();
-            context.HttpContext.Items["AuthContext"] = new AuthenticationContext
+            context.HttpContext.Items["AuthContext"] = new UserContext
             {
                 UserId = Guid.NewGuid(),
-                Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
+                Privileges = [UserPrivilege.UsersRead, UserPrivilege.TasksRead]
             };
 
             // Act
@@ -53,7 +53,7 @@ namespace Backend.Tests.Attributes
             // Arrange
             var attribute = new RequirePrivilegesAttribute(UserPrivilege.UsersWrite);
             var context = CreateAuthorizationFilterContext();
-            context.HttpContext.Items["AuthContext"] = new AuthenticationContext
+            context.HttpContext.Items["AuthContext"] = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
@@ -73,7 +73,7 @@ namespace Backend.Tests.Attributes
             // Arrange
             var attribute = new RequirePrivilegesAttribute(UserPrivilege.UsersRead, UserPrivilege.UsersWrite);
             var context = CreateAuthorizationFilterContext();
-            context.HttpContext.Items["AuthContext"] = new AuthenticationContext
+            context.HttpContext.Items["AuthContext"] = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
@@ -92,7 +92,7 @@ namespace Backend.Tests.Attributes
             // Arrange
             var attribute = new RequirePrivilegesAttribute(true, UserPrivilege.UsersRead, UserPrivilege.TasksRead);
             var context = CreateAuthorizationFilterContext();
-            context.HttpContext.Items["AuthContext"] = new AuthenticationContext
+            context.HttpContext.Items["AuthContext"] = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead, UserPrivilege.TasksWrite }
@@ -111,7 +111,7 @@ namespace Backend.Tests.Attributes
             // Arrange
             var attribute = new RequirePrivilegesAttribute(true, UserPrivilege.UsersRead, UserPrivilege.UsersWrite);
             var context = CreateAuthorizationFilterContext();
-            context.HttpContext.Items["AuthContext"] = new AuthenticationContext
+            context.HttpContext.Items["AuthContext"] = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }

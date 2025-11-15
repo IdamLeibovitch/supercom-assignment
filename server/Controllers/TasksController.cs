@@ -1,5 +1,7 @@
+using Backend.Attributes;
 using Backend.Extensions;
 using Backend.Filters;
+using Backend.Middleware;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +22,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
+        [RequirePrivileges(UserPrivilege.TasksRead, UserPrivilege.AllTasksRead)]
         public async Task<ActionResult<PaginatedResult<TaskInfo>>> GetTasks(
           [FromQuery] int pageNumber = 1,
           [FromQuery] int pageSize = 10,
@@ -32,6 +35,9 @@ namespace Backend.Controllers
             IEnumerable<TaskPriority>? priorityList = null;
             IEnumerable<Guid>? userList = null;
 
+            var userId = UserContext.CurrentUserId!.Value; // User is authorized
+            bool canReadAllTasks = UserContext.HasPrivilege(UserPrivilege.AllTasksRead);
+
             if (!string.IsNullOrEmpty(priorities))
             {
                 priorityList = priorities
@@ -41,6 +47,7 @@ namespace Backend.Controllers
                     .Select(p => p!.Value);
             }
 
+
             if (!string.IsNullOrEmpty(users))
             {
                 userList = users
@@ -48,6 +55,20 @@ namespace Backend.Controllers
                     .Select(u => Guid.TryParse(u, out var user) ? user : (Guid?)null)
                     .Where(u => u.HasValue)
                     .Select(u => u!.Value);
+
+                // Check if trying to access other users' tasks
+                if (!canReadAllTasks && userList.Any(u => u != userId))
+                {
+                    throw new ForbiddenException("You don't have permission to view other users' tasks.");
+                }
+            }
+            else
+            {
+                if (!canReadAllTasks)
+                {
+                    // User can only see their own tasks
+                    userList = [userId];
+                }
             }
 
             var result = await _tasksService.GetTasksAsync(pageNumber, pageSize, search, sortBy, ascending, priorityList, userList);
@@ -55,6 +76,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [RequirePrivileges(UserPrivilege.TasksRead, UserPrivilege.AllTasksRead)]
         public async Task<ActionResult<TaskInfo>> GetTask(Guid id)
         {
             var task = await _tasksService.GetTaskByIdAsync(id);
@@ -63,10 +85,11 @@ namespace Backend.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [RequirePrivileges(UserPrivilege.TasksCreate, UserPrivilege.AllTasksCreate)]
         public async Task<ActionResult<Guid>> CreateTask([FromBody] CreateTaskData taskData)
         {
             Guid? userId = taskData.UserId;
-            if (!userId.HasValue) userId = User.GetUserId();
+            if (!userId.HasValue) userId = UserContext.CurrentUserId;
             if (!userId.HasValue) return BadRequest("User ID is required.");
 
             var taskId = await _tasksService.CreateTaskAsync(
@@ -81,6 +104,7 @@ namespace Backend.Controllers
 
         [HttpPut("{id:guid}")]
         [ValidateModel]
+        [RequirePrivileges(UserPrivilege.TasksCreate, UserPrivilege.AllTasksCreate)]
         public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTaskData taskData)
         {
             await _tasksService.UpdateTaskAsync(

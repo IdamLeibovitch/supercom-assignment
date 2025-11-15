@@ -1,20 +1,7 @@
 import { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Avatar,
-  Typography,
-  Chip,
-  IconButton,
-  TableSortLabel,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, Typography, Chip, IconButton, TableSortLabel, } from '@mui/material';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
-import { TaskPriorityLabels, TaskPriorityColors } from '../../constants/taskPriorities';
+import { TaskPriorityLabels, TaskPriorityColors } from '../../constants';
 import { alpha } from '@mui/material/styles';
 import ViewTaskDialog from './ViewTaskDialog';
 import EditTaskDialog from './EditTaskDialog';

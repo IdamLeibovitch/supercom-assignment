@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux';
 import { IconButton, Menu, MenuItem, Avatar, ListItemIcon, ListItemText, Divider, } from '@mui/material';
 import { Settings, Logout } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { logout } from '../store/slices/authSlice';
-import { UserContext, useUser } from '../contexts';
+import { logout } from '../../store/slices/authSlice';
+import { useUser } from '../../contexts';
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   '& img': {

@@ -1,27 +1,13 @@
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Box,
-  MenuItem,
-  Autocomplete,
-  Avatar,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Typography,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Autocomplete, Avatar, ListItem, ListItemAvatar, ListItemText, Typography, } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { TaskPriority, TaskPriorityLabels } from '../../constants/taskPriorities';
+import { TaskPriority, TaskPriorityLabels } from '../../constants';
 import { useUpdateTaskMutation } from '../../store/slices/tasksSlice';
 import { useGetAllUsersQuery } from '../../store/slices/usersSlice';
+import { useToast } from '../../hooks';
 
 const EditTaskSchema = Yup.object().shape({
   title: Yup.string()
@@ -38,25 +24,30 @@ const EditTaskSchema = Yup.object().shape({
 });
 
 function EditTaskDialog({ open, onClose, task }) {
+  const toast = useToast();
   const [updateTask, { isLoading }] = useUpdateTaskMutation();
   const { data: allUsers = [] } = useGetAllUsersQuery({ page: 1, pageSize: 100 });
 
   if (!task) return null;
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
       await updateTask({
         taskId: task.id,
         taskData: values,
       }).unwrap();
+      toast.success('Task updated successfully!');
       onClose();
     } catch (err) {
-      console.error('Update task failed:', err);
+      console.error('Update failed:', err);
+      toast.error(err.data?.message || 'Failed to update task');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={open} onClose={() => {}} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={() => { }} maxWidth="sm" fullWidth>
       <DialogTitle>Edit Task</DialogTitle>
       <Formik
         initialValues={{

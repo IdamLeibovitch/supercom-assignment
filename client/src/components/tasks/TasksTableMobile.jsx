@@ -1,20 +1,8 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Avatar,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-} from '@mui/material';
+import { Box, Card, CardContent, Avatar, Typography, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Stack, } from '@mui/material';
 import { MoreVert, Visibility, Edit, Delete, CalendarToday } from '@mui/icons-material';
 import { useState } from 'react';
 import { alpha } from '@mui/material/styles';
-import { TaskPriorityColors } from '../../constants/taskPriorities';
+import { TaskPriorityColors } from '../../constants';
 import ViewTaskDialog from './ViewTaskDialog';
 import EditTaskDialog from './EditTaskDialog';
 import DeleteTaskDialog from './DeleteTaskDialog';

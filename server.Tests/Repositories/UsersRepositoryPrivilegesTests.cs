@@ -212,7 +212,7 @@ namespace Backend.Tests.Repositories
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _repository.GetUserDetailsByIdAsync(userId);
+            var result = await _repository.GetUserDetailsAsync(userId);
 
             // Assert
             result.Should().NotBeNull();

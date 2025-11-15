@@ -21,7 +21,9 @@ describe('DeleteTaskDialog', () => {
   });
 
   it('renders delete confirmation dialog', () => {
-    render(<DeleteTaskDialog open={true} onClose={mockOnClose} task={mockTask} />);
+    render(
+      <DeleteTaskDialog open={true} onClose={mockOnClose} task={mockTask} />
+    );
 
     expect(screen.getByText('Delete Task')).toBeInTheDocument();
     expect(screen.getByText(/are you sure you want to delete this task/i)).toBeInTheDocument();
@@ -43,7 +45,9 @@ describe('DeleteTaskDialog', () => {
       },
     };
 
-    render(<DeleteTaskDialog open={true} onClose={mockOnClose} task={taskWithoutFullName} />);
+    render(
+      <DeleteTaskDialog open={true} onClose={mockOnClose} task={taskWithoutFullName} />
+    );
 
     expect(screen.getByText('testuser')).toBeInTheDocument();
   });

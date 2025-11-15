@@ -90,46 +90,167 @@ namespace Backend.Tests.Middleware
         public void AuthenticationContext_HasPrivilege_ReturnsTrueForExistingPrivilege()
         {
             // Arrange
-            var authContext = new AuthenticationContext
+            var userContext = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
             };
 
             // Act & Assert
-            authContext.HasPrivilege(UserPrivilege.UsersRead).Should().BeTrue();
-            authContext.HasPrivilege(UserPrivilege.TasksRead).Should().BeTrue();
-            authContext.HasPrivilege(UserPrivilege.UsersWrite).Should().BeFalse();
+            userContext.HasUserPrivilege(UserPrivilege.UsersRead).Should().BeTrue();
+            userContext.HasUserPrivilege(UserPrivilege.TasksRead).Should().BeTrue();
+            userContext.HasUserPrivilege(UserPrivilege.UsersWrite).Should().BeFalse();
         }
 
         [Fact]
         public void AuthenticationContext_HasAnyPrivilege_ReturnsTrueIfAnyMatch()
         {
             // Arrange
-            var authContext = new AuthenticationContext
+            var userContext = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
             };
 
             // Act & Assert
-            authContext.HasAnyPrivilege(UserPrivilege.UsersRead, UserPrivilege.UsersWrite).Should().BeTrue();
-            authContext.HasAnyPrivilege(UserPrivilege.UsersWrite, UserPrivilege.UsersDelete).Should().BeFalse();
+            userContext.HasAnyUserPrivilege(UserPrivilege.UsersRead, UserPrivilege.UsersWrite).Should().BeTrue();
         }
 
         [Fact]
         public void AuthenticationContext_HasAllPrivileges_ReturnsTrueIfAllMatch()
         {
             // Arrange
-            var authContext = new AuthenticationContext
+            var userContext = new UserContext
             {
                 UserId = Guid.NewGuid(),
                 Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead, UserPrivilege.TasksWrite }
             };
 
             // Act & Assert
-            authContext.HasAllPrivileges(UserPrivilege.UsersRead, UserPrivilege.TasksRead).Should().BeTrue();
-            authContext.HasAllPrivileges(UserPrivilege.UsersRead, UserPrivilege.UsersWrite).Should().BeFalse();
+            userContext.HasAllUserPrivileges(UserPrivilege.UsersRead, UserPrivilege.TasksRead).Should().BeTrue();
+            userContext.HasAllUserPrivileges(UserPrivilege.UsersRead, UserPrivilege.UsersWrite).Should().BeFalse();
+        }
+
+        [Fact]
+        public void HttpContextExtension_HasPrivilege_ReturnsTrueWhenUserHasPrivilege()
+        {
+            // Arrange
+            var context = new DefaultHttpContext();
+            context.Items["AuthContext"] = new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
+            };
+
+            // Act & Assert
+            context.HasPrivilege(UserPrivilege.UsersRead).Should().BeTrue();
+            context.HasPrivilege(UserPrivilege.TasksRead).Should().BeTrue();
+            context.HasPrivilege(UserPrivilege.UsersWrite).Should().BeFalse();
+        }
+
+        [Fact]
+        public void HttpContextExtension_HasPrivilege_ReturnsFalseWhenNoAuthContext()
+        {
+            // Arrange
+            var context = new DefaultHttpContext();
+
+            // Act & Assert
+            context.HasPrivilege(UserPrivilege.UsersRead).Should().BeFalse();
+        }
+
+        [Fact]
+        public void HttpContextExtension_HasAnyPrivilege_ReturnsTrueWhenUserHasAny()
+        {
+            // Arrange
+            var context = new DefaultHttpContext();
+            context.Items["AuthContext"] = new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead }
+            };
+
+            // Act & Assert
+            context.HasAnyPrivilege(UserPrivilege.UsersRead, UserPrivilege.UsersWrite).Should().BeTrue();
+        }
+
+        [Fact]
+        public void HttpContextExtension_HasAllPrivileges_ReturnsTrueWhenUserHasAll()
+        {
+            // Arrange
+            var context = new DefaultHttpContext();
+            context.Items["AuthContext"] = new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead, UserPrivilege.TasksWrite }
+            };
+
+            // Act & Assert
+            context.HasAllPrivileges(UserPrivilege.UsersRead, UserPrivilege.TasksRead).Should().BeTrue();
+            context.HasAllPrivileges(UserPrivilege.UsersRead, UserPrivilege.UsersWrite).Should().BeFalse();
+        }
+
+        [Fact]
+        public void HttpContextExtension_GetCurrentUserId_ReturnsUserIdWhenAuthenticated()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var context = new DefaultHttpContext();
+            context.Items["AuthContext"] = new UserContext
+            {
+                UserId = userId,
+                Privileges = new[] { UserPrivilege.UsersRead }
+            };
+
+            // Act
+            var result = context.GetCurrentUserId();
+
+            // Assert
+            result.Should().Be(userId);
+        }
+
+        [Fact]
+        public void HttpContextExtension_GetCurrentUserId_ReturnsNullWhenNotAuthenticated()
+        {
+            // Arrange
+            var context = new DefaultHttpContext();
+
+            // Act
+            var result = context.GetCurrentUserId();
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public void HttpContextExtension_GetCurrentUserPrivileges_ReturnsPrivilegesWhenAuthenticated()
+        {
+            // Arrange
+            var privileges = new[] { UserPrivilege.UsersRead, UserPrivilege.TasksRead };
+            var context = new DefaultHttpContext();
+            context.Items["AuthContext"] = new UserContext
+            {
+                UserId = Guid.NewGuid(),
+                Privileges = privileges
+            };
+
+            // Act
+            var result = context.GetCurrentUserPrivileges();
+
+            // Assert
+            result.Should().BeEquivalentTo(privileges);
+        }
+
+        [Fact]
+        public void HttpContextExtension_GetCurrentUserPrivileges_ReturnsEmptyWhenNotAuthenticated()
+        {
+            // Arrange
+            var context = new DefaultHttpContext();
+
+            // Act
+            var result = context.GetCurrentUserPrivileges();
+
+            // Assert
+            result.Should().BeEmpty();
         }
     }
 }

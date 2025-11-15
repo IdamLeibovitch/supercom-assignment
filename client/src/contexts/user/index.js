@@ -1,3 +1,3 @@
 export * from './UserContext';
 export * from './UserProvider';
-export * from './useUser';
+export * from '../../hooks/useUser';

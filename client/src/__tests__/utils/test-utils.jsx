@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { configureStore } from '@reduxjs/toolkit';
 import { api } from '@/store/api';
 import authReducer from '@/store/slices/authSlice';
+import { ToastProvider } from '../../contexts';
 
 const theme = createTheme({
   palette: {
@@ -37,9 +38,11 @@ export function renderWithProviders(
     return (
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <MemoryRouter initialEntries={initialEntries}>
-            {children}
-          </MemoryRouter>
+          <ToastProvider>
+            <MemoryRouter initialEntries={initialEntries}>
+              {children}
+            </MemoryRouter>
+          </ToastProvider>
         </ThemeProvider>
       </Provider>
     );

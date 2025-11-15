@@ -4,7 +4,6 @@ public enum UserPrivilege
 {
     UsersRead,
     UsersWrite,
-    UsersDelete,
     UserPrivilegesRead,
     UserPrivilegesWrite,
     TasksRead,
@@ -12,7 +11,7 @@ public enum UserPrivilege
     TasksWrite,
     TasksDelete,
     AllTasksRead,
-    AllTasksCreate,
-    AllTasksWrite,
-    AllTasksDelete
+    AllTasksCreate, // create tasks for other users
+    AllTasksWrite, // edit tasks for other users
+    AllTasksDelete // delete other users tasks
 }

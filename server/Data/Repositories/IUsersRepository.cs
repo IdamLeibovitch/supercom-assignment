@@ -5,12 +5,12 @@ namespace Backend.Data.Repositories
   public interface IUsersRepository
   {
     /// <summary>
-    /// Retrieves all users
+    /// Retrieves all users with pagination
     /// </summary>
     /// <param name="page">The page number (1-based)</param>
     /// <param name="pageSize">The number of users per page</param>
-    /// <returns>A list of all users</returns>
-    Task<IEnumerable<UserInfo>> GetAllUsersAsync(int page = 1, int pageSize = 10);
+    /// <returns>A paginated result of users</returns>
+    Task<PaginatedResult<UserInfo>> GetAllUsersAsync(int page = 1, int pageSize = 10);
 
     /// <summary>
     /// Retrieves a user by their username
@@ -49,7 +49,7 @@ namespace Backend.Data.Repositories
     /// </summary>
     /// <param name="userId">The user ID to search for</param>
     /// <returns>The user details if found, null otherwise</returns>
-    Task<UserDetails?> GetUserDetailsByIdAsync(Guid userId);
+    Task<UserDetails?> GetUserDetailsAsync(Guid userId);
 
     /// <summary>
     /// Retrieves user privileges by their ID

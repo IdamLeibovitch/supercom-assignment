@@ -1,16 +1,10 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, } from '@mui/material';
 import { Warning } from '@mui/icons-material';
 import { useDeleteTaskMutation } from '../../store/slices/tasksSlice';
+import { useToast } from '../../hooks';
 
 function DeleteTaskDialog({ open, onClose, task }) {
+  const toast = useToast();
   const [deleteTask, { isLoading }] = useDeleteTaskMutation();
 
   if (!task) return null;
@@ -18,9 +12,11 @@ function DeleteTaskDialog({ open, onClose, task }) {
   const handleDelete = async () => {
     try {
       await deleteTask(task.id).unwrap();
+      toast.success('Task deleted successfully!');
       onClose();
     } catch (err) {
       console.error('Delete task failed:', err);
+      toast.error(err.data?.message || 'Failed to delete task');
     }
   };
 

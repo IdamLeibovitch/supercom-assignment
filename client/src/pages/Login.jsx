@@ -1,4 +1,4 @@
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -17,6 +17,7 @@ const LoginSchema = Yup.object().shape({
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [login, { isLoading, error }] = useLoginMutation();
 
@@ -24,7 +25,10 @@ function Login() {
     try {
       const result = await login(values).unwrap();
       dispatch(setCredentials({ user: null, token: result.token }));
-      setTimeout(() => navigate('/tasks'), 0);
+      
+      // Redirect to the page they tried to visit or to tasks
+      const from = location.state?.from?.pathname || '/tasks';
+      navigate(from, { replace: true });
     } catch (err) {
       console.error('Login failed:', err);
     } finally {

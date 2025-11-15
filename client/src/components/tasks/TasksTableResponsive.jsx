@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import TasksTableFull from './TasksTableFull';
 import TasksTableCompact from './TasksTableCompact';
 import TasksTableMobile from './TasksTableMobile';
+import ErrorBoundary from '../shared/ErrorBoundary';
 
 function TasksTableResponsive({ tasks, sortBy, ascending, onSortChange, isLoading = false }) {
   const [width, setWidth] = useState(0);
@@ -31,7 +32,14 @@ function TasksTableResponsive({ tasks, sortBy, ascending, onSortChange, isLoadin
     }
   };
 
-  return <div ref={containerRef}>{getTableComponent()}</div>;
+  return (
+    <ErrorBoundary
+      title="Table Error"
+      message="Failed to render tasks table."
+    >
+      <div ref={containerRef}>{getTableComponent()}</div>
+    </ErrorBoundary>
+  );
 }
 
 export default TasksTableResponsive;

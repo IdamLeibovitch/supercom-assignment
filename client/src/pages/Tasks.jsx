@@ -3,11 +3,12 @@ import { Box, TextField, Typography, InputAdornment, CircularProgress, Button, }
 import { Search, Add } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useGetTasksQuery } from '../store/slices/tasksSlice';
-import PageLayout from '../components/PageLayout';
+import PageLayout from '../components/layout/PageLayout';
 import TasksFilters from '../components/tasks/TasksFilters';
 import TasksTableResponsive from '../components/tasks/TasksTableResponsive';
-import TasksPagination from '../components/tasks/TasksPagination';
+import Pagination from '../components/shared/Pagination';
 import CreateTaskDialog from '../components/tasks/CreateTaskDialog';
+import ErrorBoundary from '../components/shared/ErrorBoundary';
 
 const SearchContainer = styled('div')(({ theme }) => ({
   padding: theme.spacing(2),
@@ -20,7 +21,7 @@ const SearchContainer = styled('div')(({ theme }) => ({
   },
 }));
 
-function Tasks() {
+const TasksContent = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -123,7 +124,7 @@ function Tasks() {
         )}
 
         {/* Pagination */}
-        <TasksPagination
+        <Pagination
           page={page}
           pageSize={pageSize}
           totalCount={data?.totalCount || 0}
@@ -139,6 +140,18 @@ function Tasks() {
         />
       </Box>
     </PageLayout>
+  );
+};
+
+function Tasks() {
+  return (
+    <ErrorBoundary
+      title="Failed to load tasks"
+      message="There was a problem loading the tasks page. Please try again."
+      onReset={() => window.location.reload()}
+    >
+      <TasksContent />
+    </ErrorBoundary>
   );
 }
 

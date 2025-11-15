@@ -25,16 +25,16 @@ public class RequirePrivilegesAttribute : Attribute, IAuthorizationFilter
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        var authContext = context.HttpContext.GetAuthContext();
+        var userContext = context.HttpContext.GetAuthContext();
         
-        if (authContext == null)
+        if (userContext == null)
         {
             throw new ForbiddenException("User is not authenticated.");
         }
 
         bool hasAccess = _requireAll
-            ? authContext.HasAllPrivileges(_requiredPrivileges)
-            : authContext.HasAnyPrivilege(_requiredPrivileges);
+            ? userContext.HasAllUserPrivileges(_requiredPrivileges)
+            : userContext.HasAnyUserPrivilege(_requiredPrivileges);
 
         if (!hasAccess)
         {

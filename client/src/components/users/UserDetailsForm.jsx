@@ -1,10 +1,7 @@
 import { Form, Field } from 'formik';
 import { Box, Button, TextField } from '@mui/material';
-// import { useConfirmNavigation } from '../hooks';
 
-function SettingsForm({ errors, touched, isSubmitting, dirty, resetForm, isLoading }) {
-  // useConfirmNavigation(dirty, 'You have unsaved changes. Are you sure you want to leave?');
-
+function UserDetailsForm({ errors, touched, isSubmitting, dirty, resetForm, isLoading }) {
   return (
     <Form style={{ width: '100%' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -70,4 +67,4 @@ function SettingsForm({ errors, touched, isSubmitting, dirty, resetForm, isLoadi
   );
 }
 
-export default SettingsForm;
+export default UserDetailsForm;

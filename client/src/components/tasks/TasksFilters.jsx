@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Paper, Accordion, AccordionSummary, AccordionDetails, FormControl, InputLabel, Select, MenuItem, Chip, Box, OutlinedInput, FormControlLabel, Switch, Typography, Autocomplete, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, FormControl, InputLabel, Select, MenuItem, Chip, Box, OutlinedInput, FormControlLabel, Switch, Typography, Autocomplete, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, } from '@mui/material';
 import { ExpandMore, FilterList, Clear } from '@mui/icons-material';
-import { TaskPriority, TaskPriorityLabels } from '../../constants/taskPriorities';
+import { TaskPriority, TaskPriorityLabels } from '../../constants';
 import { useGetAllUsersQuery } from '../../store/slices/usersSlice';
 
 function TasksFilters({
@@ -15,9 +15,9 @@ function TasksFilters({
   onUsersChange,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const { data: allUsers = [] } = useGetAllUsersQuery({ page: 1, pageSize: 100 });
+  const { data } = useGetAllUsersQuery({ page: 1, pageSize: 100 });
 
-  const selectedUsers = allUsers.filter((user) => users.includes(user.id));
+  const selectedUsers = (data?.items || []).filter((user) => users.includes(user.id));
 
   return (
     <Accordion
@@ -53,7 +53,13 @@ function TasksFilters({
 
           {/* Sort Direction */}
           <FormControlLabel
-            control={<Switch checked={ascending} onChange={(e) => onAscendingChange(e.target.checked)} />}
+            control={
+              <Switch
+                checked={ascending}
+                onChange={(e) => onAscendingChange(e.target.checked)}
+                inputProps={{ 'aria-label': 'Ascending' }}
+              />
+            }
             label="Ascending"
           />
 
@@ -96,7 +102,7 @@ function TasksFilters({
           <Autocomplete
             multiple
             fullWidth
-            options={allUsers}
+            options={data?.items || []}
             value={selectedUsers}
             onChange={(event, newValue) => {
               onUsersChange(newValue.map((user) => user.id));

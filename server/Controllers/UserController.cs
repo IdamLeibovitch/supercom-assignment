@@ -19,10 +19,10 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// Get current authenticated user information
+        /// Get current authenticated user information with privileges
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<UserInfo>> GetCurrentUser()
+        public async Task<ActionResult<UserDetails>> GetCurrentUser()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -31,9 +31,9 @@ namespace Backend.Controllers
                 return Unauthorized();
             }
 
-            var userInfo = await _usersService.GetUserByIdAsync(userId);
+            var userDetails = await _usersService.GetUserDetailsAsync(userId);
 
-            return Ok(userInfo);
+            return Ok(userDetails);
         }
 
         /// <summary>

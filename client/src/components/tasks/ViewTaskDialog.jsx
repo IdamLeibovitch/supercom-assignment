@@ -1,16 +1,5 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Box,
-  Typography,
-  Chip,
-  Divider,
-  Avatar,
-} from '@mui/material';
-import { TaskPriorityLabels, TaskPriorityColors } from '../../constants/taskPriorities';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, Chip, Divider, Avatar, } from '@mui/material';
+import { TaskPriorityLabels, TaskPriorityColors } from '../../constants';
 
 function ViewTaskDialog({ open, onClose, task }) {
   if (!task) return null;

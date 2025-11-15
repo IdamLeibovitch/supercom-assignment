@@ -10,6 +10,7 @@ using Backend.Middleware;
 using Backend.Data.Repositories;
 using Backend.Hubs;
 using Backend.Data.Services;
+using Backend.Data.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
@@ -133,10 +136,15 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+UserContext.Configure(app.Services.GetRequiredService<IHttpContextAccessor>());
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
+
+    // await AdminUserSeeder.SeedAdminUser(db);
+    // await AdminUserSeeder.SeedBasicUsers(db);
 }
 
 using (var scope = app.Services.CreateScope())
