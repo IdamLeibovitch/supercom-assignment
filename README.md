@@ -1,4 +1,4 @@
-# SuperCom Home Assignment - Task Management Application
+# Task Management Application
 
 This repository contains a .NET Core Web API server and a React client.
 
